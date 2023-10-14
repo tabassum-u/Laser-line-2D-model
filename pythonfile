@@ -1,0 +1,39 @@
+import numpy
+import pandas as pd
+
+x_st = 0  # (starting x coordinate)
+
+scan_space = 120  # hatch distance 120um or 0.12mm
+
+time = 0  # (first time 0)
+scan_time = 46040.45  # total time it will take to go 22.5 mm (as from center) + 120 um (hatch distance) + 22.5 mm (again travel)
+scan_space_time = 122.44897  # time for moving to hatch distance;  for 0.12 mm time is 122.45 us
+
+x_coordinate_um = []
+time_step = []
+
+iteration = 1
+for x in range(9):
+
+    if iteration % 2 != 0:  # means 1%2 = 1
+        x_st += scan_space
+        time += scan_time
+        time_step.append(time)
+        x_coordinate_um.append(x_st)
+
+    else:
+        x_st += scan_space
+        time += scan_space_time
+        time_step.append(time)
+        x_coordinate_um.append(x_st)
+    iteration += 1
+
+x_um = numpy.array(x_coordinate_um)
+time_step_us = numpy.array(time_step)
+data = pd.DataFrame([time_step_us, x_um])
+data_trans = data.T
+data_add = pd.DataFrame([[0, 0]], columns=data_trans.columns)
+data_final = pd.concat([data_add, data_trans])
+
+print(data_final)
+data_final.to_excel('LaserLine_2d.xlsx', index=False, header=False)
